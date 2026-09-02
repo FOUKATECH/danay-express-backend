@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: danay-express-backend
+
+  profiles:
+    active: dev
+
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate   # le schéma est géré par Flyway, pas par Hibernate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Africa/Douala
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Paramètres applicatifs (section 14 - sécurité)
+app:
+  jwt:
+    secret: ${JWT_SECRET:changeme-en-production-avec-une-vraie-cle-secrete}
+    expiration-minutes: 480   # 8h - à ajuster selon usage terrain (agences)
+    refresh-expiration-days: 7
+
+logging:
+  level:
+    root: INFO
+    cm.danayexpress.backend: DEBUG
