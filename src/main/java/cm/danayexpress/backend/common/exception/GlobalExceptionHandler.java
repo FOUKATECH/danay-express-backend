@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.common.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -40,6 +41,17 @@ public class GlobalExceptionHandler {
         body.put("details", fieldErrors);
 
         return ResponseEntity.badRequest().body(body);
+    }
+
+    /**
+     * Filet de sécurité : une contrainte d'unicité ou une clé étrangère
+     * violée directement en base (non anticipée par le service, ex: un
+     * doublon détecté seulement au moment d'écrire) devient une réponse
+     * 409 propre plutôt qu'une trace SQL brute renvoyée au client.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return buildResponse(HttpStatus.CONFLICT, "Cette opération viole une contrainte de données (doublon ou référence invalide).");
     }
 
     @ExceptionHandler(Exception.class)
