@@ -13,7 +13,7 @@ N°	Module	Entités principales	Statut
 5	Passagers / Transit	MouvementTransit (+ consultation)	TERMINÉ
 6	Finances	Tarifs, Recettes	TERMINÉ
 7	Incidents	Incidents, Secours	TERMINÉ
-8	Maintenance	Interventions véhicules	À FAIRE
+8	Maintenance	Interventions véhicules	TERMINÉ
 9	Reporting	Tableaux de bord, exports	À FAIRE
 10	Audit	Journalisation des actions	À FAIRE
 11	Administration	Utilisateurs, rôles, permissions, JWT	À FAIRE (critique)
@@ -44,7 +44,7 @@ Packages transverses : config/ (CORS, sécurité), common/ (AuditableEntity, Bus
 3.3. Dépendances entre modules
 Les modules ne sont pas cloisonnés : ils réutilisent directement les entités et exceptions d'autres modules quand c'est légitime (ex : Vehicule référence Agence du Référentiel ; Voyage référence Ligne/Sens/Agence + Vehicule ; Affectation référence Voyage). C'est un choix assumé du monolithe modulaire — pas de duplication de données entre modules.
 3.4. Base de données
-7 migrations Flyway appliquées à ce jour :
+8 migrations Flyway appliquées à ce jour :
 •	V1 — Référentiel (villes, agences, lignes, sens, etapes_itineraire)
 •	V2 — Parc Automobile (proprietaires, vehicules)
 •	V3 — Ressources Opérationnelles (chauffeurs, affectations)
@@ -52,6 +52,7 @@ Les modules ne sont pas cloisonnés : ils réutilisent directement les entités 
 •	V5 — Passagers (mouvements_transit)
 •	V6 — Finances (tarifs, recettes)
 •	V7 — Incidents & Secours (incidents, interventions_secours)
+•	V8 — Maintenance (interventions_maintenance)
 Convention de nommage : tables en snake_case pluriel, contraintes CHECK pour les enums, clés étrangères explicites, index sur les colonnes de recherche fréquente.
 3.5. Environnement de développement
 Le projet tourne en local avec Docker Compose pour Postgres/Redis, et l'application elle-même lancée depuis IntelliJ (profil dev).
@@ -99,15 +100,18 @@ Construit par-dessus les données d'Exploitation plutôt qu'en dupliquant des ta
 •	Mise en panne automatique du véhicule pour pannes mécaniques graves / accidents
 •	Recherche assistée de véhicules de secours disponibles (RM-13, RM-14 : filtrés par statut DISPONIBLE et agence)
 •	InterventionSecours (rattachement du véhicule de secours et du chauffeur, passage du véhicule en EN_SECOURS, suivi du workflow AFFECTE → EN_ROUTE → PRIS_EN_CHARGE → TERMINE, puis libération du véhicule)
+4.8. Module 8 — Maintenance
+•	InterventionMaintenance (véhicule, incident optionnel, typeIntervention : PREVENTIVE, CORRECTIVE, REVISION_ROUTINE, DIAGNOSTIC, AUTRE)
+•	Passage automatique du véhicule en statut EN_MAINTENANCE à la création d'une intervention
+•	Suivi des travaux réalisés, du garage/prestataire et des coûts d'intervention
+•	Remise en disponibilité automatique (DISPONIBLE) du véhicule lors de la clôture de la maintenance (CDC section 8.8)
  
 5. Ce qu'il reste à faire
-5.1. Module 8 — Maintenance
-•	Suivi des interventions sur les véhicules (déclaration de panne, passage en EN_MAINTENANCE, historique des révisions, remise en DISPONIBLE)
-5.2. Module 9 — Reporting
+5.1. Module 9 — Reporting
 •	Tableaux de bord et exports (le CDC mentionne un export PDF/Excel — dépendances déjà présentes dans le pom.xml : Apache POI, OpenPDF)
-5.3. Module 10 — Audit
+5.2. Module 10 — Audit
 •	Journalisation des actions utilisateurs (dépend du module 11 pour savoir qui fait quoi)
-5.4. Module 11 — Administration (PRIORITAIRE avant toute mise en production)
+5.3. Module 11 — Administration (PRIORITAIRE avant toute mise en production)
 Utilisateurs, rôles, permissions, authentification JWT complète.
 •	La configuration de sécurité actuelle (SecurityConfig) autorise TOUTES les requêtes sans authentification (permitAll) — c'est volontaire pour développer vite, mais ne doit jamais partir en production tel quel
 •	dépendances JWT (jjwt) déjà présentes dans le pom.xml, juste pas encore branchées
