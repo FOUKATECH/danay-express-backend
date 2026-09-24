@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.incidents.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.incidents.dto.IncidentCreateRequest;
 import cm.danayexpress.backend.incidents.dto.IncidentResponse;
 import cm.danayexpress.backend.incidents.dto.IncidentUpdateRequest;
@@ -9,7 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(config = MapStructConfig.class, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface IncidentMapper {
 
     @Mapping(source = "vehicule.id", target = "vehiculeId")

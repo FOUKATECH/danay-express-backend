@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.finances.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.finances.dto.TarifRequest;
 import cm.danayexpress.backend.finances.dto.TarifResponse;
 import cm.danayexpress.backend.finances.entity.Tarif;
@@ -7,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface TarifMapper {
 
     @Mapping(source = "origine.id", target = "origineId")

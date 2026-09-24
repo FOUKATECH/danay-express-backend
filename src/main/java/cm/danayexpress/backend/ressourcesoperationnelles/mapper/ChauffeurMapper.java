@@ -1,12 +1,13 @@
 package cm.danayexpress.backend.ressourcesoperationnelles.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.ressourcesoperationnelles.dto.ChauffeurRequest;
 import cm.danayexpress.backend.ressourcesoperationnelles.dto.ChauffeurResponse;
 import cm.danayexpress.backend.ressourcesoperationnelles.entity.Chauffeur;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface ChauffeurMapper {
 
     ChauffeurResponse toResponse(Chauffeur chauffeur);

@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.ressourcesoperationnelles.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.ressourcesoperationnelles.dto.AffectationRequest;
 import cm.danayexpress.backend.ressourcesoperationnelles.dto.AffectationResponse;
 import cm.danayexpress.backend.ressourcesoperationnelles.entity.Affectation;
@@ -7,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface AffectationMapper {
 
     @Mapping(source = "chauffeur.id", target = "chauffeurId")

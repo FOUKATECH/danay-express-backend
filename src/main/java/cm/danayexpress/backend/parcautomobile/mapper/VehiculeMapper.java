@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.parcautomobile.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.parcautomobile.dto.VehiculeRequest;
 import cm.danayexpress.backend.parcautomobile.dto.VehiculeResponse;
 import cm.danayexpress.backend.parcautomobile.entity.Vehicule;
@@ -7,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface VehiculeMapper {
 
     @Mapping(source = "proprietaire.id", target = "proprietaireId")

@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.referentiel.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.referentiel.dto.SensRequest;
 import cm.danayexpress.backend.referentiel.dto.SensResponse;
 import cm.danayexpress.backend.referentiel.entity.Sens;
@@ -7,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface SensMapper {
 
     @Mapping(source = "ligne.id", target = "ligneId")

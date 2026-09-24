@@ -14,9 +14,9 @@ N°	Module	Entités principales	Statut
 6	Finances	Tarifs, Recettes	TERMINÉ
 7	Incidents	Incidents, Secours	TERMINÉ
 8	Maintenance	Interventions véhicules	TERMINÉ
-9	Reporting	Tableaux de bord, exports	À FAIRE
-10	Audit	Journalisation des actions	À FAIRE
-11	Administration	Utilisateurs, rôles, permissions, JWT	À FAIRE (critique)
+9	Reporting	Tableaux de bord, exports	TERMINÉ
+10	Audit	Journalisation des actions	TERMINÉ
+11	Administration	Utilisateurs, rôles, permissions, JWT	TERMINÉ
 
 
 3. Architecture technique
@@ -44,7 +44,7 @@ Packages transverses : config/ (CORS, sécurité), common/ (AuditableEntity, Bus
 3.3. Dépendances entre modules
 Les modules ne sont pas cloisonnés : ils réutilisent directement les entités et exceptions d'autres modules quand c'est légitime (ex : Vehicule référence Agence du Référentiel ; Voyage référence Ligne/Sens/Agence + Vehicule ; Affectation référence Voyage). C'est un choix assumé du monolithe modulaire — pas de duplication de données entre modules.
 3.4. Base de données
-8 migrations Flyway appliquées à ce jour :
+11 migrations Flyway appliquées à ce jour :
 •	V1 — Référentiel (villes, agences, lignes, sens, etapes_itineraire)
 •	V2 — Parc Automobile (proprietaires, vehicules)
 •	V3 — Ressources Opérationnelles (chauffeurs, affectations)
@@ -53,6 +53,9 @@ Les modules ne sont pas cloisonnés : ils réutilisent directement les entités 
 •	V6 — Finances (tarifs, recettes)
 •	V7 — Incidents & Secours (incidents, interventions_secours)
 •	V8 — Maintenance (interventions_maintenance)
+•	V9 — Administration & Sécurité (roles, permissions, roles_permissions, utilisateurs)
+•	V10 — Audit (journaux_audit)
+•	V11 — Reporting & Tableaux de bord (view_recettes_par_agence, view_statistiques_vehicules)
 Convention de nommage : tables en snake_case pluriel, contraintes CHECK pour les enums, clés étrangères explicites, index sur les colonnes de recherche fréquente.
 3.5. Environnement de développement
 Le projet tourne en local avec Docker Compose pour Postgres/Redis, et l'application elle-même lancée depuis IntelliJ (profil dev).
@@ -105,20 +108,28 @@ Construit par-dessus les données d'Exploitation plutôt qu'en dupliquant des ta
 •	Passage automatique du véhicule en statut EN_MAINTENANCE à la création d'une intervention
 •	Suivi des travaux réalisés, du garage/prestataire et des coûts d'intervention
 •	Remise en disponibilité automatique (DISPONIBLE) du véhicule lors de la clôture de la maintenance (CDC section 8.8)
+4.9. Module 11 — Administration & Sécurité
+•	Utilisateur (nomUtilisateur, email, motDePasse BCrypt, nom, prenom, telephone, statut, role, agence, dernierLogin)
+•	Rôles RBAC (SUPER_ADMIN, DIRECTEUR_EXPLOITATION, COLLABORATEUR_DIRECTEUR, CHEF_SERVICE_COMMUNICATION, ASSISTANT_COMMUNICATION, CHEF_AGENCE)
+•	Permissions fines par module métier (REFERENTIEL_READ/WRITE, PARC_READ/WRITE, EXPLOITATION_*, FINANCES_*, INCIDENTS_*, MAINTENANCE_*, REPORTING_READ, ADMIN_*)
+•	Authentification JWT complète (`POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/change-password`)
+•	Sécurisation Spring Security active (`JwtAuthenticationFilter`, `JwtAuthenticationEntryPoint`, `@EnableMethodSecurity`)
+4.10. Module 10 — Journalisation & Audit
+•	JournalAudit (nomUtilisateur, action, module, elementId, description, ancienneValeur, nouvelleValeur, adresseIp, createdAt)
+•	Capture automatique de l'utilisateur connecté via le contexte de sécurité Spring Security
+•	Historisation complète des événements sensibles (CDC section 8.12 : programmation, départ, arrivée, incidents, secours, maintenance, connexions)
+•	Endpoints de consultation et filtrage multicritères par période, utilisateur, module et type d'action
+4.11. Module 9 — Reporting & Tableaux de bord
+•	Dashboard Opérationnel (`GET /api/reporting/dashboard/operationnel`) : vision temps réel de la flotte par statut, des voyages programmés/en cours/terminés, des incidents actifs, secours mobilisés, prochains départs et dernières arrivées.
+•	Dashboard Direction (`GET /api/reporting/dashboard/direction`) : agrégation des recettes globales, recettes ventilées par agence d'origine (RM-17) / ligne / véhicule, taux de disponibilité du parc (%), totaux de passagers et de voyages.
+•	Exports Excel (.xlsx via Apache POI) & PDF (.pdf via OpenPDF) pour les voyages, recettes et le parc automobile (`GET /api/reporting/export/*`).
  
-5. Ce qu'il reste à faire
-5.1. Module 9 — Reporting
-•	Tableaux de bord et exports (le CDC mentionne un export PDF/Excel — dépendances déjà présentes dans le pom.xml : Apache POI, OpenPDF)
-5.2. Module 10 — Audit
-•	Journalisation des actions utilisateurs (dépend du module 11 pour savoir qui fait quoi)
-5.3. Module 11 — Administration (PRIORITAIRE avant toute mise en production)
-Utilisateurs, rôles, permissions, authentification JWT complète.
-•	La configuration de sécurité actuelle (SecurityConfig) autorise TOUTES les requêtes sans authentification (permitAll) — c'est volontaire pour développer vite, mais ne doit jamais partir en production tel quel
-•	dépendances JWT (jjwt) déjà présentes dans le pom.xml, juste pas encore branchées
-•	C'est aussi ce module qui débloquera le module Audit (traçabilité par utilisateur)
+5. Ce qu'il reste à faire (Côté Backend)
+•	TOUS LES 11 MODULES DU BACKEND DU CAHIER DES CHARGES (v1.2) SONT DÉSORMAIS 100% TERMINÉS ET OPÉRATIONNELS !
+•	Prochaine grande étape projet : Développement de l'application Web Frontend Angular (ou intégration / tests d'intégration globaux).
  
 6. Points d'attention pour la suite
-•	Sécurité ouverte : voir 5.6, c'est le point le plus important avant toute mise en ligne réelle.
+•	Sécurité active : La sécurité JWT + RBAC (Module 11) est désormais active. Penser à renseigner un `JWT_SECRET` fort en production dans le fichier `.env`.
 •	Assistants de voyage : mentionnés dans le CDC comme fonctionnalité optionnelle ("le système pourra gérer les assistants") — volontairement laissés de côté, à ajouter si Danay Express le demande.
 •	Frontend : aucun frontend Angular n'a encore été commencé ; seul le backend existe à ce stade.
 •	Déploiement : le CDC prévoit un déploiement via Cloudflare Tunnel (serveur local, accès agences distantes par sous-domaine) — pas encore mis en place.

@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.maintenance.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.maintenance.dto.MaintenanceCreateRequest;
 import cm.danayexpress.backend.maintenance.dto.MaintenanceResponse;
 import cm.danayexpress.backend.maintenance.dto.MaintenanceUpdateRequest;
@@ -9,7 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(config = MapStructConfig.class, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MaintenanceMapper {
 
     @Mapping(source = "vehicule.id", target = "vehiculeId")

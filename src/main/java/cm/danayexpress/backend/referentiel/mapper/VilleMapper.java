@@ -1,5 +1,6 @@
 package cm.danayexpress.backend.referentiel.mapper;
 
+import cm.danayexpress.backend.common.mapper.MapStructConfig;
 import cm.danayexpress.backend.referentiel.dto.VilleRequest;
 import cm.danayexpress.backend.referentiel.dto.VilleResponse;
 import cm.danayexpress.backend.referentiel.entity.Ville;
@@ -13,7 +14,7 @@ import org.mapstruct.MappingTarget;
  * l'exécution, et toute erreur de mapping (champ oublié, type
  * incompatible) est détectée au build plutôt qu'en production.
  */
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface VilleMapper {
 
     VilleResponse toResponse(Ville ville);
